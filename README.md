@@ -17,11 +17,8 @@
 
 | RM | Nome completo |
 | --- | --- |
-| RM00000 | Frederico Nakayama Sant'anna |
-| RM00000 | Nome Completo Sem Abreviação |
-| RM00000 | Nome Completo Sem Abreviação |
-
-> ⚠️ Preencher o RM e o **nome completo, sem abreviações**, de todos os integrantes antes da entrega.
+| RM555350 | Frederico Nakayama Sant'anna |
+| RM556199 | João Pedro Veloso Pilon |
 
 ---
 
@@ -255,4 +252,4 @@ Flutter · Dart · Material 3 · `http` · `shared_preferences` · `intl` · `fl
 
 ## Vídeo pitch
 
-🎬 _Link do vídeo:_ adicionar aqui.
+🎬 &lt;Adicionar Link do video pitch aqui&gt;
