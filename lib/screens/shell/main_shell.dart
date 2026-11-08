@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../models/perfil.dart';
 import '../../services/perfil_service.dart';
 import '../../widgets/loading_view.dart';
+import '../home/home_screen.dart';
 import '../perfil/perfil_screen.dart';
 
 /// Navegação principal por abas e guarda do perfil atual (RF03).
@@ -75,13 +76,15 @@ class _MainShellState extends State<MainShell> {
 
   Widget _buildAba() {
     switch (_aba) {
+      case MainShell.abaInicio:
+        return HomeScreen(perfil: _perfil, onPerfilAlterado: _recarregarPerfil);
       case MainShell.abaPerfil:
         return PerfilScreen(
           onPerfilSalvo: (perfil) => setState(() => _perfil = perfil),
         );
       default:
-        // Início e Atividades chegam nas fases F6 e F9.
-        return Center(child: Text(_perfil?.nome ?? 'Em construção'));
+        // Minhas atividades chega na fase F9.
+        return const Center(child: Text('Em construção'));
     }
   }
 }
