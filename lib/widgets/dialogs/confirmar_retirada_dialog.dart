@@ -26,12 +26,14 @@ class ConfirmarRetiradaDialog extends StatefulWidget {
 
 class _ConfirmarRetiradaDialogState extends State<ConfirmarRetiradaDialog> {
   final TextEditingController _codigoController = TextEditingController();
+  final FocusNode _codigoFocus = FocusNode();
   String? _erro;
   bool _confirmando = false;
 
   @override
   void dispose() {
     _codigoController.dispose();
+    _codigoFocus.dispose();
     super.dispose();
   }
 
@@ -56,6 +58,12 @@ class _ConfirmarRetiradaDialogState extends State<ConfirmarRetiradaDialog> {
         _erro = e.mensagem;
         _confirmando = false;
       });
+      // Devolve o foco ao campo e seleciona o código para redigitar.
+      _codigoFocus.requestFocus();
+      _codigoController.selection = TextSelection(
+        baseOffset: 0,
+        extentOffset: _codigoController.text.length,
+      );
     }
   }
 
@@ -73,8 +81,9 @@ class _ConfirmarRetiradaDialogState extends State<ConfirmarRetiradaDialog> {
           const SizedBox(height: 16),
           TextField(
             controller: _codigoController,
+            focusNode: _codigoFocus,
             autofocus: true,
-            enabled: !_confirmando,
+            readOnly: _confirmando,
             maxLength: CodigoGenerator.tamanho,
             textCapitalization: TextCapitalization.characters,
             textAlign: TextAlign.center,

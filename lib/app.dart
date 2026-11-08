@@ -32,6 +32,11 @@ class PratinApp extends StatelessWidget {
         GlobalCupertinoLocalizations.delegate,
       ],
       initialRoute: AppRoutes.splash,
+      // Sempre começa pela Splash, que decide a próxima tela. No web, isso
+      // evita empilhar telas a partir da URL (ex.: /#/home).
+      onGenerateInitialRoutes: (_) => [
+        _onGenerateRoute(const RouteSettings(name: AppRoutes.splash)),
+      ],
       onGenerateRoute: _onGenerateRoute,
     );
   }
