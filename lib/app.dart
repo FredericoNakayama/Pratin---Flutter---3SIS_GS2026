@@ -4,7 +4,9 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'core/constants/app_routes.dart';
 import 'core/theme/app_theme.dart';
 import 'models/alimento.dart';
+import 'models/perfil.dart';
 import 'screens/detalhes/detalhes_alimento_screen.dart';
+import 'screens/novo_anuncio/novo_anuncio_screen.dart';
 import 'screens/onboarding/onboarding_screen.dart';
 import 'screens/perfil/perfil_screen.dart';
 import 'screens/shell/main_shell.dart';
@@ -44,6 +46,7 @@ class PratinApp extends StatelessWidget {
       AppRoutes.detalhes => DetalhesAlimentoScreen(
         alimento: argumentos! as Alimento,
       ),
+      AppRoutes.novoAnuncio => NovoAnuncioScreen(perfil: argumentos! as Perfil),
       // Telas das próximas fases da Spec.
       _ => Scaffold(
         appBar: AppBar(title: const Text('Pratin')),
