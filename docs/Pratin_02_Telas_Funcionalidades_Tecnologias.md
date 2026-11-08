@@ -129,7 +129,7 @@ Documento relacionado: [`Pratin_03_Spec.md`](Pratin_03_Spec.md) (especificação
 | **Objetivo** | O estabelecimento publica um alimento |
 | **Rota** | `/novo-anuncio` · **parâmetro:** `Perfil` · **retorno:** `true` quando publica |
 | **Quem acessa** | Somente Estabelecimento |
-| **Campos** | Nome · categoria (`DropdownButtonFormField`) · quantidade (numérico) + unidade (dropdown) · data de validade (`showDatePicker`, de hoje até hoje + 7 dias) · início e fim da retirada (`showDatePicker` + `showTimePicker`) · endereço (vem preenchido com o do perfil) · URL da foto (opcional) · `CheckboxListTile` **"Declaro que o alimento está próprio para consumo"** |
+| **Campos** | Nome · categoria (`DropdownButtonFormField`) · quantidade (numérico) + unidade (dropdown) · data de validade (`showDatePicker`, de hoje até hoje + 7 dias) · início e fim da retirada (`showDatePicker` + `showTimePicker`) · endereço (vem preenchido com o do perfil) · foto opcional: botões **Galeria** e **Câmera** (`image_picker`) ou campo de URL, com pré-visualização e botão para remover · `CheckboxListTile` **"Declaro que o alimento está próprio para consumo"** |
 | **Botão** | `ElevatedButton` **"Publicar anúncio"** (mostra um indicador de carregamento enquanto envia) |
 | **Validações** | Validade entre hoje e hoje + 7 dias · quantidade > 0 · janela de pelo menos 1 h, terminando até 23:59 do dia da validade e no futuro · declaração marcada |
 | **Sucesso** | `POST /alimentos` com status `DISPONIVEL` → `SnackBar` "Anúncio publicado" → `Navigator.pop(context, true)` → o Início recarrega |
@@ -202,6 +202,7 @@ DISPONIVEL ──ONG reserva──► RESERVADO ──código confirmado──�
 | **`http`** | Requisições REST ao MockAPI (exigido pelo enunciado) |
 | **`shared_preferences`** | Introdução vista, "Não mostrar novamente", perfil e favoritos |
 | **`intl`** | Formatação de datas (`dd/MM/yyyy`, `HH:mm`) |
+| **`image_picker`** | Foto do anúncio pela galeria ou câmera, reduzida e gravada como data URL |
 | **`flutter_localizations`** (SDK) | Seletores de data e hora em português |
 | **`flutter_test`** (SDK) | Testes unitários de validadores, gerador de código e models |
 | **MockAPI** (mockapi.io) | API REST simulada com os recursos `alimentos` e `reservas` |

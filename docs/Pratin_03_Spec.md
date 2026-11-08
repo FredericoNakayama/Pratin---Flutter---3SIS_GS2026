@@ -65,7 +65,7 @@ O tema oficial da Global Solution 2026.2 é **CitizenTech**: identificar um prob
 - Preço, cobrança ou pagamento de qualquer tipo. A doação é sempre gratuita (D1).
 - Notificações push, chat, mapa e geolocalização.
 - Backend próprio e regras no servidor (as regras rodam no app).
-- Upload de imagem (só URL opcional).
+- Servidor de arquivos para imagens (a foto do aparelho vai no próprio anúncio, como data URL; ver RF12, CA5).
 - Reserva parcial de lote (a reserva vale para o lote inteiro).
 
 ---
@@ -176,6 +176,7 @@ Formato dos critérios de aceite (CA): *Dado / Quando / Então*.
 - **CA2:** Dados válidos fazem `POST /alimentos` com `status = DISPONIVEL` e os dados do dono; aparece "Anúncio publicado" e a tela faz `pop(true)`; o Início recarrega.
 - **CA3:** Enquanto envia, o botão fica desabilitado com um indicador de carregamento.
 - **CA4:** O endereço vem preenchido com o endereço do perfil e pode ser editado.
+- **CA5 (foto):** A foto é opcional e pode vir da **galeria**, da **câmera** ou de uma **URL**. A foto do aparelho é reduzida para no máximo 480×480 px (JPEG, qualidade 50), convertida em data URL (`data:image/jpeg;base64,...`) e gravada no campo `fotoUrl`, porque o MockAPI não armazena arquivos. Acima de 64 KB, a foto é recusada com "Imagem muito grande. Escolha outra foto ou use uma URL." A tela mostra a pré-visualização e permite remover a foto. Escolher uma foto do aparelho limpa a URL, e vice-versa.
 
 ### RF13 — Reservar alimento
 - Somente ONG. Fluxo em RN06, implementado em `ReservaService.reservar`.
@@ -224,7 +225,7 @@ Formato dos critérios de aceite (CA): *Dado / Quando / Então*.
 | --- | --- |
 | **RN01** | **Decisão da Splash:** vai para `/home` se `onboarding_visualizado == true` **e** `onboarding_nao_mostrar == true`. Em qualquer outro caso, vai para `/onboarding`. Chave ausente = `false`. |
 | **RN02** | **CNPJ:** remover o que não for dígito; exigir 14 dígitos; rejeitar sequências com todos os dígitos iguais. 1º DV: pesos `5,4,3,2,9,8,7,6,5,4,3,2` sobre os 12 primeiros dígitos; `resto = soma % 11`; `DV = resto < 2 ? 0 : 11 - resto`. 2º DV: pesos `6,5,4,3,2,9,8,7,6,5,4,3,2` sobre os 13 primeiros dígitos, mesmo cálculo. O CNPJ é guardado **só com dígitos** e exibido como `00.000.000/0000-00`. |
-| **RN03** | **Anúncio válido:** nome com 2 a 60 caracteres · categoria e unidade obrigatórias · `quantidade > 0` (aceita decimal) · `hoje <= dataValidade <= hoje + 7 dias` · `retiradaFim - retiradaInicio >= 1 hora` · `retiradaFim <= dataValidade às 23:59` · `retiradaFim > agora` · `retiradaInicio >= agora - 5 min` · endereço com 5 ou mais caracteres · `fotoUrl` vazia ou começando com `http` · declaração "próprio para consumo" marcada. |
+| **RN03** | **Anúncio válido:** nome com 2 a 60 caracteres · categoria e unidade obrigatórias · `quantidade > 0` (aceita decimal) · `hoje <= dataValidade <= hoje + 7 dias` · `retiradaFim - retiradaInicio >= 1 hora` · `retiradaFim <= dataValidade às 23:59` · `retiradaFim > agora` · `retiradaInicio >= agora - 5 min` · endereço com 5 ou mais caracteres · `fotoUrl` vazia, começando com `http` ou data URL de imagem (`data:image/...`) · declaração "próprio para consumo" marcada. |
 | **RN04** | **Dono:** anúncios são de `estabelecimentoCnpj`; reservas são de `ongCnpj`. "Minhas atividades" filtra pelo CNPJ do perfil. |
 | **RN05** | **Lista do Início:** `status == DISPONIVEL` **e** `agora < retiradaFim`. Ordem: `dataValidade` crescente, depois `retiradaFim` crescente. |
 | **RN06** | **Reservar:** (1) `GET /alimentos/{id}`; (2) se `status != DISPONIVEL`, erro "Este alimento já foi reservado"; se `agora >= retiradaFim`, erro "O prazo de retirada deste alimento terminou"; (3) `PUT /alimentos/{id}` com `status = RESERVADO`; (4) `POST /reservas` com `status = ATIVA` e o código (RN07); (5) se o passo 4 falhar, `PUT` devolvendo o alimento para `DISPONIVEL` e mostrar o erro. A reserva vale para o lote inteiro. |
@@ -267,7 +268,7 @@ enum ViewState { inicial, carregando, sucesso, erro }
 | `retiradaInicio` | DateTime | ✅ | |
 | `retiradaFim` | DateTime | ✅ | |
 | `endereco` | String | ✅ | |
-| `fotoUrl` | String? | | |
+| `fotoUrl` | String? | | URL `http(s)` ou data URL da foto do aparelho |
 | `status` | StatusAlimento | ✅ | |
 | `estabelecimentoCnpj` | String | ✅ | Só dígitos |
 | `estabelecimentoNome` | String | ✅ | Repetido aqui para exibir sem outra consulta |
@@ -346,6 +347,7 @@ Todos os models **DEVEM** ter `fromJson(Map<String, dynamic>)`, `toJson()` e `co
 2. O filtro por query param pode trazer resultados parciais. O app **DEVE** filtrar de novo no cliente (status ou CNPJ exatos).
 3. O `PUT` **DEVE** enviar o objeto completo (`model.copyWith(status: ...).toJson()`).
 4. Os IDs são `String`.
+5. O MockAPI recusa registros com mais de ~100 KB (erro **413**). Por isso a foto do aparelho é limitada a 64 KB (RF12, CA5).
 
 **Tratamento de erros (`ApiClient`):**
 
@@ -611,7 +613,7 @@ Seguir a identidade visual de `Pratin_02_Telas_Funcionalidades_Tecnologias.md`, 
 | --- | --- |
 | RNF01 | O projeto **DEVE** compilar sem erros (`flutter build apk --debug`). Build quebrado = nota 0. |
 | RNF02 | `flutter analyze` sem erros e sem warnings. |
-| RNF03 | Dependências permitidas: `http`, `shared_preferences`, `intl`, `flutter_localizations` (SDK), `flutter_test` (SDK). Qualquer outra precisa de aprovação do grupo. |
+| RNF03 | Dependências permitidas: `http`, `shared_preferences`, `intl`, `image_picker` (foto do anúncio, aprovado pelo grupo), `flutter_localizations` (SDK), `flutter_test` (SDK). Qualquer outra precisa de aprovação do grupo. |
 | RNF04 | Gerenciamento de estado **somente com `setState`**. |
 | RNF05 | Timeout de 10 s em toda requisição. Nenhuma exceção sem tratamento chega à tela. |
 | RNF06 | Plataforma de demonstração: Android (emulador ou aparelho). iOS é opcional. |
@@ -727,7 +729,7 @@ flutter pub get
 flutter run
 
 ## Tecnologias
-Flutter, Dart, http, shared_preferences, intl, MockAPI.
+Flutter, Dart, http, shared_preferences, intl, image_picker, MockAPI.
 ```
 
 ---

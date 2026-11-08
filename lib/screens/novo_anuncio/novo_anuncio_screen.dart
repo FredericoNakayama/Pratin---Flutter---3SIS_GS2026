@@ -11,6 +11,8 @@ import '../../models/enums.dart';
 import '../../models/perfil.dart';
 import '../../services/alimento_service.dart';
 import '../../services/anuncio_validator.dart';
+import '../../services/imagem_service.dart';
+import '../../widgets/alimento_imagem.dart';
 import '../../widgets/app_text_field.dart';
 import '../../widgets/date_time_field.dart';
 import '../../widgets/primary_button.dart';
@@ -27,6 +29,7 @@ class NovoAnuncioScreen extends StatefulWidget {
 
 class _NovoAnuncioScreenState extends State<NovoAnuncioScreen> {
   final AlimentoService _alimentoService = AlimentoService();
+  final ImagemService _imagemService = ImagemService();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final TextEditingController _nomeController = TextEditingController();
   final TextEditingController _quantidadeController = TextEditingController();
@@ -43,10 +46,52 @@ class _NovoAnuncioScreenState extends State<NovoAnuncioScreen> {
   bool _declaracao = false;
   bool _publicando = false;
 
+  /// Foto escolhida no aparelho, como data URL.
+  String? _fotoDispositivo;
+  bool _carregandoFoto = false;
+
   // Erros dos campos que não são TextFormField.
   String? _erroValidade;
   String? _erroJanela;
   String? _erroDeclaracao;
+
+  @override
+  void initState() {
+    super.initState();
+    // Atualiza a pré-visualização enquanto a URL é digitada.
+    _fotoUrlController.addListener(() => setState(() {}));
+  }
+
+  /// Foto que será publicada: a do aparelho ou a URL digitada.
+  String? get _fotoSelecionada {
+    if (_fotoDispositivo != null) return _fotoDispositivo;
+    final url = _fotoUrlController.text.trim();
+    return url.startsWith('http') ? url : null;
+  }
+
+  Future<void> _escolherFoto(OrigemImagem origem) async {
+    setState(() => _carregandoFoto = true);
+    try {
+      final foto = await _imagemService.escolher(origem);
+      if (!mounted || foto == null) return;
+      setState(() {
+        _fotoDispositivo = foto;
+        _fotoUrlController.clear();
+      });
+    } on AppException catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(e.mensagem)));
+    } finally {
+      if (mounted) setState(() => _carregandoFoto = false);
+    }
+  }
+
+  void _removerFoto() {
+    setState(() => _fotoDispositivo = null);
+    _fotoUrlController.clear();
+  }
 
   @override
   void dispose() {
@@ -141,7 +186,7 @@ class _NovoAnuncioScreenState extends State<NovoAnuncioScreen> {
 
     setState(() => _publicando = true);
     final perfil = widget.perfil;
-    final fotoUrl = _fotoUrlController.text.trim();
+    final fotoUrl = _fotoDispositivo ?? _fotoUrlController.text.trim();
 
     try {
       await _alimentoService.publicar(
@@ -294,15 +339,9 @@ class _NovoAnuncioScreenState extends State<NovoAnuncioScreen> {
                   validator: AnuncioValidator.validarEndereco,
                 ),
                 const SizedBox(height: AppSpacing.lg),
-                AppTextField(
-                  controller: _fotoUrlController,
-                  label: 'URL da foto (opcional)',
-                  hint: 'https://...',
-                  icon: Icons.image_outlined,
-                  keyboardType: TextInputType.url,
-                  textInputAction: TextInputAction.done,
-                  validator: AnuncioValidator.validarFotoUrl,
-                ),
+                const SizedBox(height: AppSpacing.sm),
+                _buildTitulo('Foto (opcional)'),
+                _buildFoto(),
                 const SizedBox(height: AppSpacing.lg),
                 CheckboxListTile(
                   value: _declaracao,
@@ -334,6 +373,85 @@ class _NovoAnuncioScreenState extends State<NovoAnuncioScreen> {
           ),
         ),
       ),
+    );
+  }
+
+  /// Foto do aparelho (galeria ou câmera) ou endereço da internet.
+  Widget _buildFoto() {
+    final foto = _fotoSelecionada;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        if (foto != null) ...[
+          Stack(
+            children: [
+              AlimentoImagem.preview(
+                fotoUrl: foto,
+                categoria: _categoria ?? Categoria.outros,
+                height: 160,
+                width: double.infinity,
+                borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
+              ),
+              Positioned(
+                top: AppSpacing.xs,
+                right: AppSpacing.xs,
+                child: IconButton.filledTonal(
+                  tooltip: 'Remover foto',
+                  onPressed: _removerFoto,
+                  icon: const Icon(Icons.close),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.md),
+        ],
+        Row(
+          children: [
+            Expanded(
+              child: OutlinedButton.icon(
+                onPressed: _carregandoFoto
+                    ? null
+                    : () => _escolherFoto(OrigemImagem.galeria),
+                icon: const Icon(Icons.photo_library_outlined),
+                label: const Text('Galeria'),
+              ),
+            ),
+            const SizedBox(width: AppSpacing.md),
+            Expanded(
+              child: OutlinedButton.icon(
+                onPressed: _carregandoFoto
+                    ? null
+                    : () => _escolherFoto(OrigemImagem.camera),
+                icon: const Icon(Icons.photo_camera_outlined),
+                label: const Text('Câmera'),
+              ),
+            ),
+          ],
+        ),
+        if (_carregandoFoto)
+          const Padding(
+            padding: EdgeInsets.only(top: AppSpacing.sm),
+            child: LinearProgressIndicator(),
+          ),
+        const SizedBox(height: AppSpacing.md),
+        if (_fotoDispositivo == null)
+          AppTextField(
+            controller: _fotoUrlController,
+            label: 'Ou cole a URL da foto',
+            hint: 'https://...',
+            icon: Icons.link,
+            keyboardType: TextInputType.url,
+            textInputAction: TextInputAction.done,
+            validator: AnuncioValidator.validarFotoUrl,
+          )
+        else
+          Text(
+            'Foto do aparelho selecionada. Para usar uma URL, remova a foto.',
+            style: Theme.of(
+              context,
+            ).textTheme.bodySmall?.copyWith(color: AppColors.textSecondary),
+          ),
+      ],
     );
   }
 
