@@ -107,7 +107,7 @@ flowchart TD
 | :---: | :---: | :---: |
 | <img src="docs/prints/10-perfil.jpg" width="220"> | <img src="docs/prints/11-meus-anuncios.jpg" width="220"> | <img src="docs/prints/12-confirmar-retirada.jpg" width="220"> |
 
-| Novo anúncio | Seletor de data | Grade em tablet |
+| Novo anúncio (foto pela galeria, câmera ou URL) | Seletor de data | Grade em tablet |
 | :---: | :---: | :---: |
 | <img src="docs/prints/13-novo-anuncio.jpg" width="220"> | <img src="docs/prints/14-seletor-data.jpg" width="220"> | <img src="docs/prints/15-grade-tablet.jpg" width="220"> |
 
