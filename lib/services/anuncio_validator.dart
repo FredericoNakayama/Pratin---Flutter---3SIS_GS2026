@@ -1,5 +1,6 @@
 import '../core/constants/app_messages.dart';
 import '../core/utils/formatters.dart';
+import '../core/utils/imagem_utils.dart';
 import '../models/alimento.dart';
 
 /// Regras de um anúncio válido (RN03).
@@ -66,9 +67,10 @@ abstract final class AnuncioValidator {
       ? AppMessages.enderecoInvalido
       : null;
 
+  /// Vazia, endereço `http(s)` ou foto do aparelho (data URL).
   static String? validarFotoUrl(String? valor) {
     final url = (valor ?? '').trim();
-    return (url.isEmpty || url.startsWith('http'))
+    return (url.isEmpty || url.startsWith('http') || ImagemUtils.isDataUrl(url))
         ? null
         : AppMessages.fotoUrlInvalida;
   }

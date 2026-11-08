@@ -49,6 +49,10 @@ abstract final class AppMessages {
   static const String reservaNaoEncontrada =
       'Não encontramos a reserva ativa deste alimento.';
   static const String codigoCopiado = 'Código copiado.';
+  static const String imagemGrande =
+      'Imagem muito grande. Escolha outra foto ou use uma URL.';
+  static const String imagemIndisponivel =
+      'Não foi possível abrir a galeria ou a câmera.';
 
   // Validação de formulários.
   static const String cnpjInvalido = 'CNPJ inválido.';
