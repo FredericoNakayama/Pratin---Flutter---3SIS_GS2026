@@ -1,6 +1,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Necessária no build release para acessar a API (MockAPI). -->
+    <uses-permission android:name="android.permission.INTERNET"/>
     <application
-        android:label="pratin"
+        android:label="Pratin"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
