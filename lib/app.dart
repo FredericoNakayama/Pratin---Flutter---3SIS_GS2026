@@ -4,6 +4,8 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'core/constants/app_routes.dart';
 import 'core/theme/app_theme.dart';
 import 'screens/onboarding/onboarding_screen.dart';
+import 'screens/perfil/perfil_screen.dart';
+import 'screens/shell/main_shell.dart';
 import 'screens/splash/splash_screen.dart';
 
 /// Raiz do app: tema, idioma e rotas.
@@ -29,9 +31,14 @@ class PratinApp extends StatelessWidget {
   }
 
   static Route<dynamic> _onGenerateRoute(RouteSettings settings) {
+    final argumentos = settings.arguments;
     final Widget tela = switch (settings.name) {
       AppRoutes.splash => const SplashScreen(),
       AppRoutes.onboarding => const OnboardingScreen(),
+      AppRoutes.home => MainShell(
+        abaInicial: argumentos is int ? argumentos : MainShell.abaInicio,
+      ),
+      AppRoutes.perfil => const PerfilScreen(empilhada: true),
       // Telas das próximas fases da Spec.
       _ => Scaffold(
         appBar: AppBar(title: const Text('Pratin')),
