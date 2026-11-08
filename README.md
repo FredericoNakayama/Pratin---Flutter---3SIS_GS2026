@@ -242,7 +242,7 @@ dart run tool/seed.dart
 | 2. Onboarding | `screens/onboarding` – 3 páginas, Voltar/Avançar/Pular, "Não mostrar novamente" |
 | 3. Navegação | 6 telas principais, parâmetros entre telas, retorno com `Navigator.pop` |
 | 4. WebService | `data/api` – pacote `http`, models, 4 estados, mensagem de erro e "Tentar novamente" |
-| 5. Componentes | Column, Row, Card, ListView/GridView, Scaffold, AppBar, botões, Icon/IconButton, Image.asset/Image.network |
+| 5. Componentes | Column, Row, Card, ListView/GridView, Scaffold, AppBar, botões, Icon/IconButton, Image.asset/Image.network/Image.memory |
 | 6. Interações | Lista → detalhes, busca, filtro, favoritos, puxar para atualizar, reservar, cancelar, confirmar retirada |
 | 7. Organização e estado | Camadas separadas, `setState`, widgets reutilizáveis, 57 testes automatizados |
 
@@ -250,7 +250,7 @@ dart run tool/seed.dart
 
 ## Tecnologias
 
-Flutter · Dart · Material 3 · `http` · `shared_preferences` · `intl` · `flutter_localizations` · MockAPI
+Flutter · Dart · Material 3 · `http` · `shared_preferences` · `intl` · `image_picker` · `flutter_localizations` · MockAPI
 
 ## Vídeo pitch
 
