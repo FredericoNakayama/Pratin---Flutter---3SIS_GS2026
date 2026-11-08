@@ -215,7 +215,7 @@ flutter analyze
 flutter test
 ```
 
-**Dados de demonstração:** cadastra 6 alimentos com datas a partir do dia da execução.
+**Dados de demonstração:** cadastra 25 anúncios, a maioria produtos embalados (arroz, feijão, farinhas, massas, enlatados, pães de forma, leite, café), com datas a partir do dia da execução. Itens que já estão disponíveis na API não são duplicados.
 
 ```bash
 dart run tool/seed.dart
@@ -228,6 +228,8 @@ dart run tool/seed.dart
 | Estabelecimento | Padaria Pão Quente | 11.222.333/0001-81 |
 | Estabelecimento | Mercado Bom Preço | 11.444.777/0001-61 |
 | Estabelecimento | Restaurante Sabor Caseiro | 98.765.432/0001-98 |
+| Estabelecimento | Supermercado Economia | 33.444.555/0001-81 |
+| Estabelecimento | Mercearia São José | 55.666.777/0001-81 |
 | ONG | ONG Mesa Cheia | 12.345.678/0001-95 |
 
 ---
