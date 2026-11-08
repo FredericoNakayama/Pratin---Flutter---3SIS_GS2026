@@ -19,6 +19,8 @@ dependencies:
   shared_preferences: ^2.5.6
   # Formatação de datas. Versão fixada pelo flutter_localizations.
   intl: ^0.20.2
+  # Foto do anúncio escolhida na galeria ou tirada com a câmera.
+  image_picker: ^1.2.4
 
 dev_dependencies:
   flutter_test:

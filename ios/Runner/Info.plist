@@ -8,6 +8,10 @@
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
 	<string>Pratin</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>O Pratin usa suas fotos para ilustrar os anúncios de alimentos.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>O Pratin usa a câmera para fotografar os alimentos anunciados.</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
