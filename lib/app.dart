@@ -3,6 +3,8 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 
 import 'core/constants/app_routes.dart';
 import 'core/theme/app_theme.dart';
+import 'screens/onboarding/onboarding_screen.dart';
+import 'screens/splash/splash_screen.dart';
 
 /// Raiz do app: tema, idioma e rotas.
 class PratinApp extends StatelessWidget {
@@ -27,12 +29,15 @@ class PratinApp extends StatelessWidget {
   }
 
   static Route<dynamic> _onGenerateRoute(RouteSettings settings) {
-    // As telas são registradas aqui conforme as fases da Spec avançam.
-    return MaterialPageRoute<void>(
-      settings: settings,
-      builder: (_) => Scaffold(
-        body: Center(child: Image.asset('assets/images/logo.png', width: 160)),
+    final Widget tela = switch (settings.name) {
+      AppRoutes.splash => const SplashScreen(),
+      AppRoutes.onboarding => const OnboardingScreen(),
+      // Telas das próximas fases da Spec.
+      _ => Scaffold(
+        appBar: AppBar(title: const Text('Pratin')),
+        body: const Center(child: Text('Em construção')),
       ),
-    );
+    };
+    return MaterialPageRoute<dynamic>(settings: settings, builder: (_) => tela);
   }
 }
