@@ -1,16 +1,28 @@
 import 'package:flutter/material.dart';
 
+import '../../core/constants/app_messages.dart';
+import '../../core/constants/app_routes.dart';
+import '../../core/exceptions/app_exception.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_spacing.dart';
 import '../../core/utils/formatters.dart';
 import '../../models/alimento.dart';
+import '../../models/enums.dart';
+import '../../models/perfil.dart';
 import '../../services/favoritos_service.dart';
+import '../../services/perfil_service.dart';
+import '../../services/reserva_service.dart';
 import '../../widgets/alimento_imagem.dart';
+import '../../widgets/dialogs/confirmacao_dialog.dart';
+import '../../widgets/dialogs/perfil_necessario_dialog.dart';
 import '../../widgets/favorito_button.dart';
 import '../../widgets/info_row.dart';
+import '../../widgets/primary_button.dart';
 import '../../widgets/status_chip.dart';
 
-/// Anúncio completo de um alimento (RF11).
+/// Anúncio completo de um alimento e reserva pela ONG (RF11, RF13).
+///
+/// Devolve `true` quando o Início precisa recarregar a lista.
 class DetalhesAlimentoScreen extends StatefulWidget {
   const DetalhesAlimentoScreen({super.key, required this.alimento});
 
@@ -21,9 +33,13 @@ class DetalhesAlimentoScreen extends StatefulWidget {
 }
 
 class _DetalhesAlimentoScreenState extends State<DetalhesAlimentoScreen> {
+  final PerfilService _perfilService = PerfilService();
   final FavoritosService _favoritosService = FavoritosService();
+  final ReservaService _reservaService = ReservaService();
 
+  Perfil? _perfil;
   bool _favorito = false;
+  bool _reservando = false;
 
   Alimento get _alimento => widget.alimento;
 
@@ -34,9 +50,50 @@ class _DetalhesAlimentoScreenState extends State<DetalhesAlimentoScreen> {
   }
 
   Future<void> _carregarDadosLocais() async {
+    final perfil = await _perfilService.carregar();
     final favoritos = await _favoritosService.carregar();
     if (!mounted) return;
-    setState(() => _favorito = favoritos.contains(_alimento.id));
+    setState(() {
+      _perfil = perfil;
+      _favorito = favoritos.contains(_alimento.id);
+    });
+  }
+
+  Future<void> _reservar() async {
+    var perfil = _perfil;
+    if (perfil == null) {
+      final salvou = await PerfilNecessarioDialog.abrir(context);
+      if (!salvou || !mounted) return;
+      await _carregarDadosLocais();
+      perfil = _perfil;
+      // Quem acabou de virar estabelecimento não pode reservar.
+      if (perfil == null || !perfil.isOng || !mounted) return;
+    }
+
+    final confirmou = await ConfirmacaoDialog.abrir(
+      context,
+      titulo: 'Reservar alimento',
+      mensagem:
+          'Reservar "${_alimento.nome}"? A reserva vale para o lote inteiro.',
+      textoConfirmar: 'Reservar',
+    );
+    if (!confirmou || !mounted) return;
+
+    setState(() => _reservando = true);
+    try {
+      final reserva = await _reservaService.reservar(_alimento, perfil);
+      if (!mounted) return;
+      await Navigator.of(
+        context,
+      ).pushReplacementNamed(AppRoutes.confirmacaoReserva, arguments: reserva);
+    } on AppException catch (e) {
+      if (!mounted) return;
+      setState(() => _reservando = false);
+      final messenger = ScaffoldMessenger.of(context);
+      messenger.showSnackBar(SnackBar(content: Text(e.mensagem)));
+      // Item reservado por outra ONG ou fora do prazo: volta e recarrega.
+      if (e.tipo == TipoErro.regraNegocio) Navigator.of(context).pop(true);
+    }
   }
 
   Future<void> _alternarFavorito() async {
@@ -57,6 +114,7 @@ class _DetalhesAlimentoScreenState extends State<DetalhesAlimentoScreen> {
           FavoritoButton(favorito: _favorito, onPressed: _alternarFavorito),
         ],
       ),
+      bottomNavigationBar: _buildAcao(),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.only(bottom: AppSpacing.xl),
@@ -170,6 +228,49 @@ class _DetalhesAlimentoScreenState extends State<DetalhesAlimentoScreen> {
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  /// ONG e quem não tem perfil veem "Reservar"; estabelecimento vê um aviso.
+  Widget? _buildAcao() {
+    if (_alimento.status != StatusAlimento.disponivel) return null;
+    final perfil = _perfil;
+
+    final Widget conteudo;
+    if (perfil != null && perfil.isEstabelecimento) {
+      conteudo = Row(
+        children: [
+          const Icon(Icons.info_outline, color: AppColors.textSecondary),
+          const SizedBox(width: AppSpacing.sm),
+          Expanded(
+            child: Text(
+              AppMessages.apenasOngs,
+              style: Theme.of(
+                context,
+              ).textTheme.bodyMedium?.copyWith(color: AppColors.textSecondary),
+            ),
+          ),
+        ],
+      );
+    } else {
+      conteudo = PrimaryButton(
+        label: 'Reservar',
+        icon: Icons.volunteer_activism,
+        carregando: _reservando,
+        onPressed: _reservar,
+      );
+    }
+
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(
+          AppSpacing.page,
+          AppSpacing.sm,
+          AppSpacing.page,
+          AppSpacing.page,
+        ),
+        child: conteudo,
       ),
     );
   }
