@@ -52,11 +52,8 @@ class PratinApp extends StatelessWidget {
       AppRoutes.confirmacaoReserva => ConfirmacaoReservaScreen(
         reserva: argumentos! as Reserva,
       ),
-      // Telas das próximas fases da Spec.
-      _ => Scaffold(
-        appBar: AppBar(title: const Text('Pratin')),
-        body: const Center(child: Text('Em construção')),
-      ),
+      // Rota desconhecida: volta ao início do app.
+      _ => const SplashScreen(),
     };
     return MaterialPageRoute<dynamic>(settings: settings, builder: (_) => tela);
   }

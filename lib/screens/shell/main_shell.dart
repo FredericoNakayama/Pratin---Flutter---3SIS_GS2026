@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../models/perfil.dart';
 import '../../services/perfil_service.dart';
 import '../../widgets/loading_view.dart';
+import '../atividades/atividades_screen.dart';
 import '../home/home_screen.dart';
 import '../perfil/perfil_screen.dart';
 
@@ -83,8 +84,10 @@ class _MainShellState extends State<MainShell> {
           onPerfilSalvo: (perfil) => setState(() => _perfil = perfil),
         );
       default:
-        // Minhas atividades chega na fase F9.
-        return const Center(child: Text('Em construção'));
+        return AtividadesScreen(
+          perfil: _perfil,
+          onConfigurarPerfil: () => _irParaAba(MainShell.abaPerfil),
+        );
     }
   }
 }
