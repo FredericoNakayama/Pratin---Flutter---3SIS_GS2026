@@ -5,6 +5,8 @@ import 'core/constants/app_routes.dart';
 import 'core/theme/app_theme.dart';
 import 'models/alimento.dart';
 import 'models/perfil.dart';
+import 'models/reserva.dart';
+import 'screens/confirmacao_reserva/confirmacao_reserva_screen.dart';
 import 'screens/detalhes/detalhes_alimento_screen.dart';
 import 'screens/novo_anuncio/novo_anuncio_screen.dart';
 import 'screens/onboarding/onboarding_screen.dart';
@@ -47,6 +49,9 @@ class PratinApp extends StatelessWidget {
         alimento: argumentos! as Alimento,
       ),
       AppRoutes.novoAnuncio => NovoAnuncioScreen(perfil: argumentos! as Perfil),
+      AppRoutes.confirmacaoReserva => ConfirmacaoReservaScreen(
+        reserva: argumentos! as Reserva,
+      ),
       // Telas das próximas fases da Spec.
       _ => Scaffold(
         appBar: AppBar(title: const Text('Pratin')),
