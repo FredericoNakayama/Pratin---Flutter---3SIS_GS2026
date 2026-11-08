@@ -17,8 +17,10 @@ abstract final class AppMessages {
   static const String buscaVazia = 'Nenhum alimento encontrado.';
   static const String favoritosVazio =
       'Nenhum dos seus favoritos está disponível agora.';
-  static const String reservasVazias = 'Você ainda não reservou nenhum alimento.';
-  static const String anunciosVazios = 'Você ainda não publicou nenhum anúncio.';
+  static const String reservasVazias =
+      'Você ainda não reservou nenhum alimento.';
+  static const String anunciosVazios =
+      'Você ainda não publicou nenhum anúncio.';
   static const String semPerfilAtividades =
       'Configure seu perfil para ver suas atividades.';
 
