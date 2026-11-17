@@ -257,4 +257,4 @@ Flutter · Dart · Material 3 · `http` · `shared_preferences` · `intl` · `im
 
 ## Vídeo pitch
 
-🎬 &lt;Adicionar Link do video pitch aqui&gt;
+🎬 [Assistir ao vídeo pitch no YouTube](https://www.youtube.com/watch?v=5OSnA0EIRk4&t=147s)
